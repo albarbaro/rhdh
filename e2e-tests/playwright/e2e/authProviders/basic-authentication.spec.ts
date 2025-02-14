@@ -76,6 +76,7 @@ test.describe("Standard authentication providers: Basic authentication", () => {
       constants.QUAY_REPO,
       constants.TAG_NAME,
       [
+        "--values ../.ibm/pipelines/value_files/values_showcase-auth-provider-diff-azure.yaml",
         "--set upstream.backstage.appConfig.auth.environment=development",
         "--set upstream.backstage.appConfig.signInPage=microsoft",
         "--set upstream.backstage.appConfig.catalog.providers=null",
@@ -111,6 +112,7 @@ test.describe("Standard authentication providers: Basic authentication", () => {
       constants.QUAY_REPO,
       constants.TAG_NAME,
       [
+        "--values ../.ibm/pipelines/value_files/values_showcase-auth-provider-diff-azure.yaml",
         "--set upstream.backstage.appConfig.auth.environment=development",
         "--set upstream.backstage.appConfig.signInPage=microsoft",
         "--set upstream.backstage.appConfig.dangerouslyAllowSignInWithoutUserInCatalog=true",
@@ -154,6 +156,7 @@ test.describe("Standard authentication providers: Basic authentication", () => {
       constants.QUAY_REPO,
       constants.TAG_NAME,
       [
+        "--values ../.ibm/pipelines/value_files/values_showcase-auth-provider-diff-azure.yaml",
         "--set upstream.backstage.appConfig.auth.environment=production",
         "--set upstream.backstage.appConfig.signInPage=microsoft",
         "--set upstream.backstage.appConfig.dangerouslyAllowSignInWithoutUserInCatalog=true",

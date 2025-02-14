@@ -1,0 +1,53 @@
+global:
+  dynamic:
+    includes:
+      - dynamic-plugins.default.yaml
+    plugins:
+      - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-msgraph-dynamic
+        disabled: false
+      - package: ./dynamic-plugins/dist/backstage-community-plugin-rbac
+        disabled: false
+upstream:
+  backstage:
+    appConfig:
+      signInPage: microsoft
+      auth:
+        providers:
+          microsoft:
+            development:
+              clientId: ${AUTH_PROVIDERS_AZURE_CLIENT_ID}
+              clientSecret: ${AUTH_PROVIDERS_AZURE_CLIENT_SECRET}
+              tenantId: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
+              domainHint: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
+            production:
+              clientId: ${AUTH_PROVIDERS_AZURE_CLIENT_ID}
+              clientSecret: ${AUTH_PROVIDERS_AZURE_CLIENT_SECRET}
+              tenantId: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
+              domainHint: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
+      catalog:
+        providers:
+          microsoftGraphOrg:
+            default:
+              target: https://graph.microsoft.com/v1.0
+              authority: https://login.microsoftonline.com
+              tenantId: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
+              clientId: ${AUTH_PROVIDERS_AZURE_CLIENT_ID}
+              clientSecret: ${AUTH_PROVIDERS_AZURE_CLIENT_SECRET}
+              user:
+                filter: accountEnabled eq true and userType eq 'member' and startswith(displayName,'QE')
+              group:
+                filter: >
+                  securityEnabled eq true
+                  and mailEnabled eq false
+                  and startswith(displayName,'rhdh_test_group_')
+              schedule:
+                frequency: PT1M
+                timeout: PT1M
+      permission:
+        enabled: true
+        rbac:
+          policyFileReload: true
+          policies-csv-file: './rbac/rbac-policy.csv'
+          admin:
+            users:
+              - name: user:default/qeadmin_rhdhtesting.onmicrosoft.com

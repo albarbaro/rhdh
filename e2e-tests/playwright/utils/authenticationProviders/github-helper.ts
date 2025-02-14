@@ -5,7 +5,7 @@ import * as helper from "../helper";
 
 const app = new App({
   appId: constants.AUTH_ORG_APP_ID,
-  privateKey: constants.AUTH_ORG_PK,
+  privateKey: constants.AUTH_ORG1_PRIVATE_KEY,
 });
 
 const octokit = await app.getInstallationOctokit(54960509);

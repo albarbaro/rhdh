@@ -1,6 +1,16 @@
+global:
+  dynamic:
+    includes:
+      - dynamic-plugins.default.yaml
+    plugins:
+      - package: ./dynamic-plugins/dist/backstage-community-plugin-catalog-backend-module-keycloak-dynamic
+        disabled: false
+      - package: ./dynamic-plugins/dist/backstage-community-plugin-rbac
+        disabled: false
 upstream:
   backstage:
     appConfig:
+      signInPage: oidc
       auth:
         providers:
           oidc:
@@ -22,3 +32,11 @@ upstream:
               schedule:
                 frequency: { minutes: 1 }
                 timeout: { minutes: 1 }
+      permission:
+        enabled: true
+        rbac:
+          policyFileReload: true
+          policies-csv-file: './rbac/rbac-policy.csv'
+          admin:
+            users:
+              - name: user:default/rhsso_admin

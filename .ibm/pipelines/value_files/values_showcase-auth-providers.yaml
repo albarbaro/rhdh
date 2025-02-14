@@ -14,7 +14,7 @@ global:
 upstream:
   backstage:
     appConfig:
-      signInPage: oidc
+      signInPage: github
       auth:
         environment: production
         session:
@@ -22,28 +22,6 @@ upstream:
         providers:
           guest:
             dangerouslyAllowOutsideDevelopment: true
-          microsoft:
-            development:
-              clientId: ${AUTH_PROVIDERS_AZURE_CLIENT_ID}
-              clientSecret: ${AUTH_PROVIDERS_AZURE_CLIENT_SECRET}
-              tenantId: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
-              domainHint: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
-            production:
-              clientId: ${AUTH_PROVIDERS_AZURE_CLIENT_ID}
-              clientSecret: ${AUTH_PROVIDERS_AZURE_CLIENT_SECRET}
-              tenantId: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
-              domainHint: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
-          github:
-            production:
-              clientSecret: ${AUTH_ORG_CLIENT_SECRET}
-              clientId: ${AUTH_ORG_CLIENT_ID}
-          oidc:
-            production:
-              metadataUrl: ${RHSSO76_METADATA_URL}
-              clientId: ${RHSSO76_CLIENT_ID}
-              clientSecret: ${RHSSO76_CLIENT_SECRET}
-              prompt: auto 
-              callbackUrl: ${RHSSO76_CALLBACK_URL}
       integrations:
         github:
           - host: github.com
@@ -58,53 +36,9 @@ upstream:
           - type: url
             target: https://github.com/janus-qe/auth-providers/blob/main/location.yaml
         rules:
-          - allow: [Component, Group, User, Resource, Location, Template]          
-        providers:
-          githubOrg:
-            - id: github
-              githubUrl: https://github.com
-              orgs: ['${AUTH_PROVIDERS_GH_ORG_NAME}']
-              schedule:
-                initialDelay: { seconds: 0 }
-                frequency: { minutes: 1 }
-                timeout: { minutes: 1 }
-          microsoftGraphOrg:
-            default:
-              target: https://graph.microsoft.com/v1.0
-              authority: https://login.microsoftonline.com
-              tenantId: ${AUTH_PROVIDERS_AZURE_TENANT_ID}
-              clientId: ${AUTH_PROVIDERS_AZURE_CLIENT_ID}
-              clientSecret: ${AUTH_PROVIDERS_AZURE_CLIENT_SECRET}
-              user:
-                filter: accountEnabled eq true and userType eq 'member' and startswith(displayName,'QE')
-              group:
-                filter: >
-                  securityEnabled eq true
-                  and mailEnabled eq false
-                  and startswith(displayName,'rhdh_test_group_')
-              schedule:
-                frequency: PT1M
-                timeout: PT1M
-          keycloakOrg:
-            default:
-              baseUrl: ${RHSSO76_URL}
-              loginRealm: ${AUTH_PROVIDERS_REALM_NAME}
-              realm: ${AUTH_PROVIDERS_REALM_NAME}
-              clientId: ${RHSSO76_CLIENT_ID}
-              clientSecret: ${RHSSO76_CLIENT_SECRET}
-              schedule:
-                frequency: { minutes: 1 }
-                timeout: { minutes: 1 }
+          - allow: [Component, Group, User, Resource, Location, Template]                    
       permission:
-        enabled: true
-        rbac:
-          policyFileReload: true
-          policies-csv-file: './rbac/rbac-policy.csv'
-          admin:
-            users:
-              - name: user:default/qeadmin_rhdhtesting.onmicrosoft.com
-              - name: user:default/rhsso_admin
-              - name: user:default/rhdhqeauthadmin
+        enabled: false
       backend:
         auth:
           externalAccess:

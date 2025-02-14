@@ -3,29 +3,71 @@ import GroupRepresentation from "@keycloak/keycloak-admin-client/lib/defs/groupR
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
 import { Group, User } from "@microsoft/microsoft-graph-types";
 
+// required by all auth scenarios
+export const AUTH_PROVIDERS_NAMESPACE = process.env.AUTH_PROVIDERS_NAMESPACE ? process.env.AUTH_PROVIDERS_NAMESPACE : "showcase-auth-providers";
+export const STATIC_API_TOKEN = process.env.STATIC_API_TOKEN ? process.env.STATIC_API_TOKEN : "somecicdtoken";
+export const AUTH_PROVIDERS_RELEASE = process.env.AUTH_PROVIDERS_RELEASE ? process.env.AUTH_PROVIDERS_RELEASE : "rhdh-auth-providers";
+export const AUTH_PROVIDERS_CHART = process.env.AUTH_PROVIDERS_CHART ? process.env.AUTH_PROVIDERS_CHART : "rhdh-chart/backstage";
+export const CHART_VERSION = process.env.CHART_VERSION ? process.env.CHART_VERSION : "2.15.2";
+export const QUAY_REPO = process.env.QUAY_REPO ? process.env.QUAY_REPO : "redhat-developer/rhdh";
+export const TAG_NAME = process.env.TAG_NAME ? process.env.TAG_NAME : "next";
+export const LOGS_FOLDER = process.env.LOGS_FOLDER ? process.env.LOGS_FOLDER : "/tmp/backstage-showcase/e2e-tests/auth-providers-logs";
+export const AUTH_PROVIDERS_VALUES_FILE ="../.ibm/pipelines/value_files/values_showcase-auth-providers.yaml";
+export const AUTH_PROVIDERS_BASE_URL = process.env.BASE_URL ? process.env.BASE_URL : `https://${AUTH_PROVIDERS_RELEASE}-backstage-${AUTH_PROVIDERS_NAMESPACE}.${process.env.K8S_CLUSTER_ROUTER_BASE}`;
+export const AUTH_PROVIDERS_REALM_NAME = process.env.AUTH_PROVIDERS_REALM_NAME ? process.env.AUTH_PROVIDERS_REALM_NAME : "authProviders";
+export const RBAC_POLICY_ROLES: string = `
+p, role:default/admin, catalog-entity, read, allow
+p, role:default/admin, catalog-entity, update, allow
+p, role:default/admin, catalog-entity, delete, allow
+p, role:default/admin, catalog.entity.create, create, allow
+p, role:default/admin, catalog.entity.read, read, allow
+p, role:default/admin, catalog.entity.refresh, update, allow
+p, role:default/admin, catalog.entity.delete, delete, allow
+p, role:default/admin, kubernetes.proxy, use, allow
+p, role:default/admin, catalog.location.create, create, allow
+p, role:default/admin, catalog.location.read, read, allow
+p, role:default/admin, policy-entity, read, allow
+p, role:default/admin, policy-entity, create, allow
+p, role:default/reader, catalog-entity, read, allow
+p, role:default/reader, catalog.entity.read, read, allow
+p, role:default/reader, catalog.location.read, read, allow
+p, role:default/location_admin, catalog.location.read, read, allow
+p, role:default/location_admin, catalog.location.create, create, allow
+p, role:default/location_admin, catalog.location.delete, delete, allow
+p, role:default/location_admin, catalog.entity.read, read, allow
+p, role:default/location_admin, catalog.entity.refresh, update, allow
+p, role:default/location_admin, catalog.entity.delete, delete, allow
+g, group:default/rhdh_test_group_1, role:default/reader
+g, group:default/rhdh_test_group_2, role:default/reader
+g, group:default/rhdh_test_group_3, role:default/reader
+g, group:default/rhdh_test_group_4, role:default/reader
+g, group:default/rhdh_test_group_5, role:default/reader
+g, group:default/rhdh_test_group_6, role:default/reader
+g, group:default/rhdh_test_group_location_reader, role:default/location_admin
+g, user:default/qeadmin_rhdhtesting.onmicrosoft.com, role:default/admin
+g, group:default/rhsso_group_1, role:default/reader
+g, group:default/rhsso_group_2, role:default/reader
+g, group:default/rhsso_group_3, role:default/reader
+g, group:default/rhsso_group_4, role:default/reader
+g, group:default/rhsso_group_location_reader, role:default/location_admin
+g, user:default/rhsso_admin, role:default/admin
+g, user:default/rhdhqeauthadmin, role:default/admin
+g, group:default/gh_team_1, role:default/reader
+g, group:default/gh_team_2, role:default/reader
+g, group:default/gh_team_3, role:default/reader
+g, group:default/gh_team_4, role:default/reader
+g, group:default/gh_team_location_reader, role:default/location_admin
+`;
+
 // required by RHSSO
-export const RHSSO76_ADMIN_USERNAME = process.env.RHSSO76_ADMIN_USERNAME;
-export const RHSSO76_ADMIN_PASSWORD = process.env.RHSSO76_ADMIN_PASSWORD;
-export const RHSSO76_DEFAULT_PASSWORD = process.env.RHSSO76_DEFAULT_PASSWORD;
-export const RHSSO76_URL = process.env.RHSSO76_URL;
-export const RHSSO76_CLIENT_SECRET = process.env.RHSSO76_CLIENT_SECRET;
-export const RHSSO76_CLIENTID = process.env.RHSSO76_CLIENT_ID;
-export const RHSSO76_METADATA_URL =
-  "https://keycloak-rhsso.rhdh-pr-os-a9805650830b22c3aee243e51d79565d-0000.us-east.containers.appdomain.cloud/auth/realms/authProviders";
-
-export const RHBK_ADMIN_USERNAME = process.env.RHBK_ADMIN_USERNAME;
-export const RHBK_ADMIN_PASSWORD = process.env.RHBK_ADMIN_PASSWORD;
-export const RHBK_DEFAULT_PASSWORD = process.env.RHBK_DEFAULT_PASSWORD;
-export const RHBK_URL = process.env.RHBK_URL;
-export const RHBK_CLIENT_SECRET = process.env.RHBK_CLIENT_SECRET;
-export const RHBK_CLIENTID = process.env.RHBK_CLIENT_ID;
-export const RHBK_METADATA_URL =
-  "https://rhbk-rhbk.rhdh-pr-os-a9805650830b22c3aee243e51d79565d-0000.us-east.containers.appdomain.cloud/realms/authProviders";
-
-export const AUTH_PROVIDERS_REALM_NAME = process.env.AUTH_PROVIDERS_REALM_NAME
-  ? process.env.AUTH_PROVIDERS_REALM_NAME
-  : "authProviders";
-
+export const RHSSO76_ADMIN_USERNAME = process.env.RHSSO76_ADMIN_USERNAME ? process.env.RHSSO76_ADMIN_USERNAME : "";
+export const RHSSO76_ADMIN_PASSWORD = process.env.RHSSO76_ADMIN_PASSWORD ? process.env.RHSSO76_ADMIN_PASSWORD : "";
+export const RHSSO76_DEFAULT_PASSWORD = process.env.RHSSO76_DEFAULT_PASSWORD ? process.env.RHSSO76_DEFAULT_PASSWORD : "";
+export const RHSSO76_URL = process.env.RHSSO76_URL ? process.env.RHSSO76_URL : "";
+export const RHSSO76_CLIENT_SECRET = process.env.RHSSO76_CLIENT_SECRET ? process.env.RHSSO76_CLIENT_SECRET : "";
+export const RHSSO76_CLIENTID = process.env.RHSSO76_CLIENT_ID ? process.env.RHSSO76_CLIENT_ID : "";
+export const RHSSO76_CALLBACK_URL = process.env.BASE_URL ? `${process.env.BASE_URL}/api/auth/oidc/handler/frame` : ""
+export const RHSSO76_METADATA_URL = process.env.RHSSO76_METADATA_URL ? process.env.RHSSO76_METADATA_URL : "https://keycloak-rhsso.rhdh-pr-os-a9805650830b22c3aee243e51d79565d-0000.us-east.containers.appdomain.cloud/auth/realms/authProviders";
 export const RHSSO76_GROUPS: { [key: string]: GroupRepresentation } = {
   group_1: {
     name: "rhsso_group_1",
@@ -171,15 +213,22 @@ export const RHSSO76_CLIENT: ClientRepresentation = {
   implicitFlowEnabled: true,
 };
 
+// required by RHBK
+export const RHBK_ADMIN_USERNAME = process.env.RHBK_ADMIN_USERNAME ? process.env.RHBK_ADMIN_USERNAME : "";
+export const RHBK_ADMIN_PASSWORD = process.env.RHBK_ADMIN_PASSWORD ? process.env.RHBK_ADMIN_PASSWORD : "";
+export const RHBK_DEFAULT_PASSWORD = process.env.RHBK_DEFAULT_PASSWORD ? process.env.RHBK_DEFAULT_PASSWORD : "";
+export const RHBK_URL = process.env.RHBK_URL ? process.env.RHBK_URL : "";
+export const RHBK_CLIENT_SECRET = process.env.RHBK_CLIENT_SECRET ? process.env.RHBK_CLIENT_SECRET : "";
+export const RHBK_CLIENTID = process.env.RHBK_CLIENT_ID ? process.env.RHBK_CLIENT_ID : "";
+export const RHBK_METADATA_URL = process.env.RHBK_METADATA_URL ? process.env.RHBK_METADATA_URL : "https://rhbk-rhbk.rhdh-pr-os-a9805650830b22c3aee243e51d79565d-0000.us-east.containers.appdomain.cloud/realms/security-team-realm";
+export const RHBK_CALLBACK_URL = process.env.BASE_URL ? `${process.env.BASE_URL}/api/auth/oidc/handler/frame` : ""
+
 // required by azure
-export const AZURE_LOGIN_USERNAME = process.env.AZURE_LOGIN_USERNAME;
-export const AZURE_LOGIN_PASSWORD = process.env.AZURE_LOGIN_PASSWORD;
-export const AUTH_PROVIDERS_AZURE_CLIENT_ID =
-  process.env.AUTH_PROVIDERS_AZURE_CLIENT_ID;
-export const AUTH_PROVIDERS_AZURE_CLIENT_SECRET =
-  process.env.AUTH_PROVIDERS_AZURE_CLIENT_SECRET;
-export const AUTH_PROVIDERS_AZURE_TENANT_ID =
-  process.env.AUTH_PROVIDERS_AZURE_TENANT_ID;
+export const AZURE_LOGIN_USERNAME = process.env.AZURE_LOGIN_USERNAME ? process.env.AZURE_LOGIN_USERNAME : "";
+export const AZURE_LOGIN_PASSWORD = process.env.AZURE_LOGIN_PASSWORD ? process.env.AZURE_LOGIN_PASSWORD : "";
+export const AUTH_PROVIDERS_AZURE_CLIENT_ID = process.env.AUTH_PROVIDERS_AZURE_CLIENT_ID ? process.env.AUTH_PROVIDERS_AZURE_CLIENT_ID : "";
+export const AUTH_PROVIDERS_AZURE_CLIENT_SECRET = process.env.AUTH_PROVIDERS_AZURE_CLIENT_SECRET ? process.env.AUTH_PROVIDERS_AZURE_CLIENT_SECRET : "";
+export const AUTH_PROVIDERS_AZURE_TENANT_ID = process.env.AUTH_PROVIDERS_AZURE_TENANT_ID ? process.env.AUTH_PROVIDERS_AZURE_TENANT_ID : "";
 export const JDOE_NEW_EMAIL = "jenny-doe-new-email@example.com";
 export const AZURE_LOGIN_FIRSTNAME = "QE RHDH Testing Admin";
 export const MSGRAPH_SETTINGS: AppSettings = {
@@ -357,9 +406,7 @@ export const GH_TEAMS: { [key: string]: { name: string } } = {
     name: "gh_team_location_reader",
   },
 };
-export const GH_USERS: {
-  [key: string]: { name: string; displayName: string };
-} = {
+export const GH_USERS: { [key: string]: { name: string; displayName: string } } = {
   user_1: {
     name: "rhdhqeauth1",
     displayName: "RHDH QE User 1",
@@ -371,86 +418,13 @@ export const GH_USERS: {
 };
 
 // required by Github
-export const AUTH_PROVIDERS_GH_ORG_NAME =
-  process.env.AUTH_PROVIDERS_GH_ORG_NAME;
-export const AUTH_ORG_APP_ID = process.env.AUTH_ORG_APP_ID;
-export const AUTH_ORG_CLIENT_ID = process.env.AUTH_ORG_CLIENT_ID;
-export const AUTH_ORG_CLIENT_SECRET = process.env.AUTH_ORG_CLIENT_SECRET;
-export const AUTH_ORG1_PRIVATE_KEY = process.env.AUTH_ORG1_PRIVATE_KEY;
-export const AUTH_ORG_PK = process.env.AUTH_ORG_PK;
-export const AUTH_ORG_WEBHOOK_SECRET = process.env.AUTH_ORG_WEBHOOK_SECRET;
-export const GH_USER_PASSWORD = process.env.GH_USER_PASSWORD;
-export const AUTH_PROVIDERS_GH_USER_2FA =
-  process.env.AUTH_PROVIDERS_GH_USER_2FA;
-export const AUTH_PROVIDERS_GH_ADMIN_2FA =
-  process.env.AUTH_PROVIDERS_GH_ADMIN_2FA;
-
-// required by all auth scenarios
-export const AUTH_PROVIDERS_NAMESPACE = process.env.AUTH_PROVIDERS_NAMESPACE
-  ? process.env.AUTH_PROVIDERS_NAMESPACE
-  : "showcase-auth-providers";
-export const STATIC_API_TOKEN = process.env.STATIC_API_TOKEN
-  ? process.env.STATIC_API_TOKEN
-  : "somecicdtoken";
-export const AUTH_PROVIDERS_RELEASE = process.env.AUTH_PROVIDERS_RELEASE
-  ? process.env.AUTH_PROVIDERS_RELEASE
-  : "rhdh-auth-providers";
-export const AUTH_PROVIDERS_CHART = process.env.AUTH_PROVIDERS_CHART
-  ? process.env.AUTH_PROVIDERS_CHART
-  : "rhdh-chart/backstage";
-export const CHART_VERSION = process.env.CHART_VERSION
-  ? process.env.CHART_VERSION
-  : "2.15.2";
-export const QUAY_REPO = process.env.QUAY_REPO
-  ? process.env.QUAY_REPO
-  : "redhat-developer/rhdh";
-export const TAG_NAME = process.env.TAG_NAME;
-export const LOGS_FOLDER = process.env.LOGS_FOLDER
-  ? process.env.LOGS_FOLDER
-  : "/tmp/backstage-showcase/e2e-tests/auth-providers-logs";
-export const AUTH_PROVIDERS_VALUES_FILE =
-  "../.ibm/pipelines/value_files/values_showcase-auth-providers.yaml";
-export const AUTH_PROVIDERS_BASE_URL = `https://${AUTH_PROVIDERS_RELEASE}-backstage-${AUTH_PROVIDERS_NAMESPACE}.${process.env.K8S_CLUSTER_ROUTER_BASE}`;
-export const RBAC_POLICY_ROLES: string = `
-p, role:default/admin, catalog-entity, read, allow
-p, role:default/admin, catalog-entity, update, allow
-p, role:default/admin, catalog-entity, delete, allow
-p, role:default/admin, catalog.entity.create, create, allow
-p, role:default/admin, catalog.entity.read, read, allow
-p, role:default/admin, catalog.entity.refresh, update, allow
-p, role:default/admin, catalog.entity.delete, delete, allow
-p, role:default/admin, kubernetes.proxy, use, allow
-p, role:default/admin, catalog.location.create, create, allow
-p, role:default/admin, catalog.location.read, read, allow
-p, role:default/admin, policy-entity, read, allow
-p, role:default/admin, policy-entity, create, allow
-p, role:default/reader, catalog-entity, read, allow
-p, role:default/reader, catalog.entity.read, read, allow
-p, role:default/reader, catalog.location.read, read, allow
-p, role:default/location_admin, catalog.location.read, read, allow
-p, role:default/location_admin, catalog.location.create, create, allow
-p, role:default/location_admin, catalog.location.delete, delete, allow
-p, role:default/location_admin, catalog.entity.read, read, allow
-p, role:default/location_admin, catalog.entity.refresh, update, allow
-p, role:default/location_admin, catalog.entity.delete, delete, allow
-g, group:default/rhdh_test_group_1, role:default/reader
-g, group:default/rhdh_test_group_2, role:default/reader
-g, group:default/rhdh_test_group_3, role:default/reader
-g, group:default/rhdh_test_group_4, role:default/reader
-g, group:default/rhdh_test_group_5, role:default/reader
-g, group:default/rhdh_test_group_6, role:default/reader
-g, group:default/rhdh_test_group_location_reader, role:default/location_admin
-g, user:default/qeadmin_rhdhtesting.onmicrosoft.com, role:default/admin
-g, group:default/rhsso_group_1, role:default/reader
-g, group:default/rhsso_group_2, role:default/reader
-g, group:default/rhsso_group_3, role:default/reader
-g, group:default/rhsso_group_4, role:default/reader
-g, group:default/rhsso_group_location_reader, role:default/location_admin
-g, user:default/rhsso_admin, role:default/admin
-g, user:default/rhdhqeauthadmin, role:default/admin
-g, group:default/gh_team_1, role:default/reader
-g, group:default/gh_team_2, role:default/reader
-g, group:default/gh_team_3, role:default/reader
-g, group:default/gh_team_4, role:default/reader
-g, group:default/gh_team_location_reader, role:default/location_admin
-`;
+export const AUTH_PROVIDERS_GH_ORG_NAME = process.env.AUTH_PROVIDERS_GH_ORG_NAME ? process.env.AUTH_PROVIDERS_GH_ORG_NAME : "";
+export const AUTH_ORG_APP_ID = process.env.AUTH_ORG_APP_ID ? process.env.AUTH_ORG_APP_ID : "";
+export const AUTH_ORG_CLIENT_ID = process.env.AUTH_ORG_CLIENT_ID ? process.env.AUTH_ORG_CLIENT_ID : "";
+export const AUTH_ORG_CLIENT_SECRET = process.env.AUTH_ORG_CLIENT_SECRET ? process.env.AUTH_ORG_CLIENT_SECRET : "";
+export const AUTH_ORG1_PRIVATE_KEY = process.env.AUTH_ORG1_PRIVATE_KEY ? process.env.AUTH_ORG1_PRIVATE_KEY : "";
+export const AUTH_ORG_PK = process.env.AUTH_ORG_PK ? process.env.AUTH_ORG_PK : "";
+export const AUTH_ORG_WEBHOOK_SECRET = process.env.AUTH_ORG_WEBHOOK_SECRET ? process.env.AUTH_ORG_WEBHOOK_SECRET : "";
+export const GH_USER_PASSWORD = process.env.GH_USER_PASSWORD ? process.env.GH_USER_PASSWORD : "";
+export const AUTH_PROVIDERS_GH_USER_2FA = process.env.AUTH_PROVIDERS_GH_USER_2FA ? process.env.AUTH_PROVIDERS_GH_USER_2FA : "";
+export const AUTH_PROVIDERS_GH_ADMIN_2FA = process.env.AUTH_PROVIDERS_GH_ADMIN_2FA ? process.env.AUTH_PROVIDERS_GH_ADMIN_2FA : "";

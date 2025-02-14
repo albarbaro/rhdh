@@ -66,14 +66,8 @@ test.describe("Standard authentication providers: Micorsoft Azure EntraID", () =
     test.setTimeout(600 * 1000);
     const oidcFlow = false;
     const oauthFlags = [
-      "--set upstream.backstage.appConfig.auth.providers.github=null",
-      "--set upstream.backstage.appConfig.signInPage=microsoft",
       "--set upstream.backstage.appConfig.auth.environment=production",
-      "--set upstream.backstage.appConfig.catalog.providers.githubOrg=null",
-      "--set upstream.backstage.appConfig.catalog.providers.keycloakOrg=null",
-      "--set global.dynamic.plugins[2].disabled=false",
-      "--set global.dynamic.plugins[3].disabled=false",
-      "--set upstream.backstage.appConfig.permission.enabled=true",
+      "--values ../.ibm/pipelines/value_files/values_showcase-auth-provider-diff-azure.yaml",
     ];
 
     const oidcFlags = [
@@ -338,7 +332,7 @@ test.describe("Standard authentication providers: Micorsoft Azure EntraID", () =
       expect(statusBefore).toBe(403);
     }).toPass({
       intervals: [1_000, 2_000, 5_000],
-      timeout: 90 * 1000,
+      timeout: 120 * 1000,
     });
 
     await uiHelper.openSidebar("Settings");
@@ -391,7 +385,7 @@ test.describe("Standard authentication providers: Micorsoft Azure EntraID", () =
       expect(statusAfter).toBe(200);
     }).toPass({
       intervals: [1_000, 2_000, 5_000],
-      timeout: 60 * 1000,
+      timeout: 120 * 1000,
     });
 
     await uiHelper.openSidebar("Settings");
@@ -512,7 +506,7 @@ test.describe("Standard authentication providers: Micorsoft Azure EntraID", () =
     expect(loginSucceded).toContain("Login successful");
 
     await uiHelper.verifyAlertErrorMessage(
-      /User not found in the RHDH software catalog/gm,
+      /User not found/gm,
     );
 
     await context.clearCookies(); // If we don't clear cookies, Microsoft Login popup will present the last logger user

@@ -63,15 +63,8 @@ test.describe("Standard authentication providers: Github Provider", () => {
       constants.QUAY_REPO,
       constants.TAG_NAME,
       [
-        "--set upstream.backstage.appConfig.signInPage=github",
+        "--values ../.ibm/pipelines/value_files/values_showcase-auth-provider-diff-github.yaml",
         "--set upstream.backstage.appConfig.auth.environment=production",
-        "--set upstream.backstage.appConfig.catalog.providers.microsoftGraphOrg=null",
-        "--set upstream.backstage.appConfig.catalog.providers.keycloakOrg=null",
-        "--set upstream.backstage.appConfig.auth.providers.microsoft=null",
-        "--set upstream.backstage.appConfig.auth.providers.oidc=null",
-        "--set global.dynamic.plugins[1].disabled=false",
-        "--set global.dynamic.plugins[3].disabled=false",
-        "--set upstream.backstage.appConfig.permission.enabled=true",
         "--set upstream.postgresql.primary.persistence.enabled=false",
       ],
     );

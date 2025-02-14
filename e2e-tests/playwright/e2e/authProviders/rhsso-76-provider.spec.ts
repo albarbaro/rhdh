@@ -38,12 +38,6 @@ for (const version of ["RHBK"]) {
       LOGGER.info(
         `Staring scenario: Standard authentication providers: OIDC with ${version}: attemp #${testInfo.retry}`,
       );
-      expect(constants.RHSSO76_ADMIN_USERNAME).not.toBeNull();
-      expect(constants.RHSSO76_ADMIN_PASSWORD).not.toBeNull();
-      expect(constants.RHSSO76_DEFAULT_PASSWORD).not.toBeNull();
-      expect(constants.RHSSO76_URL).not.toBeNull();
-      expect(constants.RHSSO76_CLIENT_SECRET).not.toBeNull();
-      expect(constants.RHSSO76_CLIENTID).not.toBeNull();
 
       expect(constants.RHBK_ADMIN_USERNAME).not.toBeNull();
       expect(constants.RHBK_ADMIN_PASSWORD).not.toBeNull();
@@ -75,9 +69,7 @@ for (const version of ["RHBK"]) {
       common = new Common(page);
       uiHelper = new UIhelper(page);
 
-      if (version == "RHSSO") {
-        helmParams = [];
-      } else if (version == "RHBK") {
+      if (version == "RHBK") {
         helmParams = [
           "--values ../.ibm/pipelines/value_files/values_showcase-auth-provider-diff-rhbk.yaml",
         ];
@@ -104,12 +96,9 @@ for (const version of ["RHBK"]) {
         constants.QUAY_REPO,
         constants.TAG_NAME,
         [
-          "--set global.dynamic.plugins[0].disabled=false",
           "--set upstream.postgresql.primary.persistence.enabled=false",
           "--set upstream.backstage.appConfig.catalog.providers.githubOrg=null",
           "--set upstream.backstage.appConfig.catalog.providers.microsoftOrg=null",
-          "--set global.dynamic.plugins[3].disabled=false",
-          "--set upstream.backstage.appConfig.permission.enabled=true",
           ...helmParams,
         ],
       );
@@ -159,13 +148,8 @@ for (const version of ["RHBK"]) {
         constants.QUAY_REPO,
         constants.TAG_NAME,
         [
-          "--set global.dynamic.plugins[0].disabled=false",
-          "--set global.dynamic.plugins[1].disabled=true",
-          "--set global.dynamic.plugins[2].disabled=true",
           "--set upstream.postgresql.primary.persistence.enabled=false",
           "--set upstream.backstage.appConfig.auth.providers.oidc.production.signIn.resolvers[0].resolver=emailMatchingUserEntityProfileEmail",
-          "--set global.dynamic.plugins[3].disabled=false",
-          "--set upstream.backstage.appConfig.permission.enabled=true",
           ...helmParams,
         ],
       );
@@ -221,13 +205,8 @@ for (const version of ["RHBK"]) {
         constants.QUAY_REPO,
         constants.TAG_NAME,
         [
-          "--set global.dynamic.plugins[0].disabled=false",
-          "--set global.dynamic.plugins[1].disabled=true",
-          "--set global.dynamic.plugins[2].disabled=true",
           "--set upstream.postgresql.primary.persistence.enabled=false",
           "--set upstream.backstage.appConfig.auth.providers.oidc.production.signIn.resolvers[0].resolver=preferredUsernameMatchingUserEntityName",
-          "--set global.dynamic.plugins[3].disabled=false",
-          "--set upstream.backstage.appConfig.permission.enabled=true",
           ...helmParams,
         ],
       );

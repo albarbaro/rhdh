@@ -25,7 +25,6 @@ export async function runShellCmd(command: string) {
         return;
       } else {
         LOGGER.info(`Process failed with code ${code}: ${result}`);
-        console.log(`Process failed with code ${code}: ${result}`);
         throw Error(`Error executing shell command; exit code ${code}`);
       }
     });
@@ -219,93 +218,37 @@ export async function ensureEnvSecretExists(
   LOGGER.info(`Ensuring secret ${secretName} exists in namespace ${namespace}`);
   const secretData = {
     BASE_URL: Buffer.from(process.env.BASE_URL).toString("base64"),
-    AUTH_PROVIDERS_AZURE_CLIENT_SECRET: Buffer.from(
-      constants.AUTH_PROVIDERS_AZURE_CLIENT_SECRET,
-    ).toString("base64"),
-    AUTH_PROVIDERS_AZURE_CLIENT_ID: Buffer.from(
-      constants.AUTH_PROVIDERS_AZURE_CLIENT_ID,
-    ).toString("base64"),
-    AUTH_PROVIDERS_AZURE_TENANT_ID: Buffer.from(
-      constants.AUTH_PROVIDERS_AZURE_TENANT_ID,
-    ).toString("base64"),
-    AUTH_PROVIDERS_REALM_NAME: Buffer.from(
-      constants.AUTH_PROVIDERS_REALM_NAME,
-    ).toString("base64"),
-    AZURE_LOGIN_USERNAME: Buffer.from(constants.AZURE_LOGIN_USERNAME).toString(
-      "base64",
-    ),
-    AZURE_LOGIN_PASSWORD: Buffer.from(constants.AZURE_LOGIN_PASSWORD).toString(
-      "base64",
-    ),
-    RHSSO76_DEFAULT_PASSWORD: Buffer.from(
-      constants.RHSSO76_DEFAULT_PASSWORD,
-    ).toString("base64"),
-    RHSSO76_METADATA_URL: Buffer.from(
-      `${constants.RHSSO76_URL}/realms/authProviders`,
-    ).toString("base64"),
+    AUTH_PROVIDERS_AZURE_CLIENT_SECRET: Buffer.from(constants.AUTH_PROVIDERS_AZURE_CLIENT_SECRET).toString("base64"),
+    AUTH_PROVIDERS_AZURE_CLIENT_ID: Buffer.from(constants.AUTH_PROVIDERS_AZURE_CLIENT_ID).toString("base64"),
+    AUTH_PROVIDERS_AZURE_TENANT_ID: Buffer.from(constants.AUTH_PROVIDERS_AZURE_TENANT_ID).toString("base64"),
+    AUTH_PROVIDERS_REALM_NAME: Buffer.from(constants.AUTH_PROVIDERS_REALM_NAME).toString("base64"),
+    AZURE_LOGIN_USERNAME: Buffer.from(constants.AZURE_LOGIN_USERNAME).toString( "base64"),
+    AZURE_LOGIN_PASSWORD: Buffer.from(constants.AZURE_LOGIN_PASSWORD).toString("base64"),
+    RHSSO76_DEFAULT_PASSWORD: Buffer.from(constants.RHSSO76_DEFAULT_PASSWORD).toString("base64"),
+    RHSSO76_METADATA_URL: Buffer.from(`${constants.RHSSO76_URL}/realms/authProviders`).toString("base64"),
     RHSSO76_URL: Buffer.from(constants.RHSSO76_URL).toString("base64"),
-    RHSSO76_CLIENT_ID: Buffer.from(constants.RHSSO76_CLIENTID).toString(
-      "base64",
-    ),
-    RHSSO76_ADMIN_USERNAME: Buffer.from(
-      constants.RHSSO76_ADMIN_USERNAME,
-    ).toString("base64"),
-    RHSSO76_ADMIN_PASSWORD: Buffer.from(
-      constants.RHSSO76_ADMIN_PASSWORD,
-    ).toString("base64"),
-    RHSSO76_CALLBACK_URL: Buffer.from(
-      `${process.env.BASE_URL}/api/auth/oidc/handler/frame`,
-    ).toString("base64"),
-    RHSSO76_CLIENT_SECRET: Buffer.from(
-      constants.RHSSO76_CLIENT_SECRET,
-    ).toString("base64"),
-
-    RHBK_DEFAULT_PASSWORD: Buffer.from(
-      constants.RHSSO76_DEFAULT_PASSWORD,
-    ).toString("base64"),
-    RHBK_METADATA_URL: Buffer.from(
-      `${constants.RHBK_URL}/realms/authProviders`,
-    ).toString("base64"),
+    RHSSO76_CLIENT_ID: Buffer.from(constants.RHSSO76_CLIENTID).toString("base64"),
+    RHSSO76_ADMIN_USERNAME: Buffer.from(constants.RHSSO76_ADMIN_USERNAME).toString("base64"),
+    RHSSO76_ADMIN_PASSWORD: Buffer.from(constants.RHSSO76_ADMIN_PASSWORD).toString("base64"),
+    RHSSO76_CALLBACK_URL: Buffer.from(constants.RHSSO76_CALLBACK_URL).toString("base64"),
+    RHSSO76_CLIENT_SECRET: Buffer.from(constants.RHSSO76_CLIENT_SECRET).toString("base64"),
+    RHBK_DEFAULT_PASSWORD: Buffer.from(constants.RHSSO76_DEFAULT_PASSWORD).toString("base64"),
+    RHBK_METADATA_URL: Buffer.from(constants.RHBK_METADATA_URL).toString("base64"),
     RHBK_CLIENT_ID: Buffer.from(constants.RHBK_CLIENTID).toString("base64"),
-    RHBK_ADMIN_USERNAME: Buffer.from(constants.RHBK_ADMIN_USERNAME).toString(
-      "base64",
-    ),
-    RHBK_ADMIN_PASSWORD: Buffer.from(constants.RHBK_ADMIN_PASSWORD).toString(
-      "base64",
-    ),
-    RHBK_CALLBACK_URL: Buffer.from(
-      `${process.env.BASE_URL}/api/auth/oidc/handler/frame`,
-    ).toString("base64"),
-    RHBK_CLIENT_SECRET: Buffer.from(constants.RHBK_CLIENT_SECRET).toString(
-      "base64",
-    ),
+    RHBK_ADMIN_USERNAME: Buffer.from(constants.RHBK_ADMIN_USERNAME).toString("base64"),
+    RHBK_ADMIN_PASSWORD: Buffer.from(constants.RHBK_ADMIN_PASSWORD).toString("base64"),
+    RHBK_CALLBACK_URL: Buffer.from(constants.RHBK_CALLBACK_URL).toString("base64"),
+    RHBK_CLIENT_SECRET: Buffer.from(constants.RHBK_CLIENT_SECRET).toString("base64"),
     RHBK_URL: Buffer.from(constants.RHBK_URL).toString("base64"),
-
     AUTH_ORG_APP_ID: Buffer.from(constants.AUTH_ORG_APP_ID).toString("base64"),
-    AUTH_ORG_CLIENT_ID: Buffer.from(constants.AUTH_ORG_CLIENT_ID).toString(
-      "base64",
-    ),
-    AUTH_ORG_CLIENT_SECRET: Buffer.from(
-      constants.AUTH_ORG_CLIENT_SECRET,
-    ).toString("base64"),
-    AUTH_ORG1_PRIVATE_KEY: Buffer.from(
-      constants.AUTH_ORG1_PRIVATE_KEY,
-    ).toString("base64"),
-    AUTH_ORG_WEBHOOK_SECRET: Buffer.from(
-      constants.AUTH_ORG_WEBHOOK_SECRET,
-    ).toString("base64"),
-    AUTH_PROVIDERS_GH_ORG_NAME: Buffer.from(
-      constants.AUTH_PROVIDERS_GH_ORG_NAME,
-    ).toString("base64"),
-    GH_USER_PASSWORD: Buffer.from(constants.GH_USER_PASSWORD).toString(
-      "base64",
-    ),
-    AUTH_PROVIDERS_GH_USER_2FA: Buffer.from(
-      constants.AUTH_PROVIDERS_GH_USER_2FA,
-    ).toString("base64"),
-    AUTH_PROVIDERS_GH_ADMIN_2FA: Buffer.from(
-      constants.AUTH_PROVIDERS_GH_ADMIN_2FA,
-    ).toString("base64"),
+    AUTH_ORG_CLIENT_ID: Buffer.from(constants.AUTH_ORG_CLIENT_ID).toString("base64"),
+    AUTH_ORG_CLIENT_SECRET: Buffer.from(constants.AUTH_ORG_CLIENT_SECRET).toString("base64"),
+    AUTH_ORG1_PRIVATE_KEY: Buffer.from(constants.AUTH_ORG1_PRIVATE_KEY).toString("base64"),
+    AUTH_ORG_WEBHOOK_SECRET: Buffer.from(constants.AUTH_ORG_WEBHOOK_SECRET).toString("base64"),
+    AUTH_PROVIDERS_GH_ORG_NAME: Buffer.from(constants.AUTH_PROVIDERS_GH_ORG_NAME).toString("base64"),
+    GH_USER_PASSWORD: Buffer.from(constants.GH_USER_PASSWORD).toString("base64"),
+    AUTH_PROVIDERS_GH_USER_2FA: Buffer.from(constants.AUTH_PROVIDERS_GH_USER_2FA).toString("base64"),
+    AUTH_PROVIDERS_GH_ADMIN_2FA: Buffer.from(constants.AUTH_PROVIDERS_GH_ADMIN_2FA).toString("base64"),
   };
   const secret: V1Secret = {
     metadata: {
