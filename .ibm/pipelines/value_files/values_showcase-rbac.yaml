@@ -123,7 +123,6 @@ global:
                       priority: 100
       - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
         disabled: false
-        #Disabled due to https://issues.redhat.com/browse/RHIDP-12153
         pluginConfig:
           catalog:
             providers:
@@ -149,10 +148,9 @@ global:
                 githubUrl: ${GITHUB_URL}
                 orgs:
                   - ${GITHUB_ORG}
-                  - ${GITHUB_ORG_2}
                 schedule:
                   frequency:
-                    hours: 24
+                    minutes: 60
                   initialDelay:
                     seconds: 15
                   timeout:
