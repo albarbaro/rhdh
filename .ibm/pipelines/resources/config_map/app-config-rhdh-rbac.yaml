@@ -134,12 +134,12 @@ catalog:
           timeout: { minutes: 1 }
     github:
       my-test-org:
-        organization: janus-qe
+        organization: "${GITHUB_ORG}"
         catalogPath: "/catalog-info.yaml"
         schedule:
           # Let's perform a single execution per test run
           frequency:
-            hours: 24
+            hours: 15
           timeout:
             minutes: 1
           initialDelay:
@@ -151,7 +151,7 @@ catalog:
       schedule:
         # Let's perform a single execution per test run
         frequency:
-          hours: 24
+          hours: 15
         timeout:
           minutes: 1
         initialDelay:
