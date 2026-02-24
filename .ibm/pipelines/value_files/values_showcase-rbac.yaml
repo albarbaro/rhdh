@@ -131,7 +131,6 @@ global:
                   organization: janus-qe
                   catalogPath: "/catalog-info.yaml"
                   schedule:
-                    # Let's perform a single execution per test run
                     frequency:
                       hours: 24
                     timeout:
