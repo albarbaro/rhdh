@@ -30,9 +30,6 @@ handle_ocp_fips_helm() {
   run_standard_deployment_tests
 }
 
-# Same shape as base_deployment() in utils.sh, but merges diff-values_showcase-fips.yaml
-# onto values_showcase.yaml, since base_deployment()/helm::install() are hardwired to
-# the default values_showcase.yaml.
 fips_deployment() {
   common::require_vars "RELEASE_NAME" "TAG_NAME" "IMAGE_REGISTRY" "IMAGE_REPO" "K8S_CLUSTER_ROUTER_BASE" || return 1
   local artifacts_subdir=$1
@@ -47,10 +44,15 @@ fips_deployment() {
   local rhdh_base_url="https://${RELEASE_NAME}-developer-hub-${NAME_SPACE}.${K8S_CLUSTER_ROUTER_BASE}"
   apply_yaml_files "${DIR}" "${NAME_SPACE}" "${rhdh_base_url}"
 
-  helm::merge_values "overwrite" "${DIR}/value_files/${HELM_CHART_VALUE_FILE_NAME}" "${fips_diff_value_file}" "${fips_merged_value_file}"
+  # Merge base + FIPS diff → merged file
+  helm::merge_values "overwrite" \
+    "${DIR}/value_files/${HELM_CHART_VALUE_FILE_NAME}" \
+    "${fips_diff_value_file}" \
+    "${fips_merged_value_file}"
+
   common::save_artifact "${artifacts_subdir}" "${fips_merged_value_file}" || true
 
-  log::info "Deploying image from repository: ${IMAGE_REGISTRY}/${IMAGE_REPO}, TAG_NAME: ${TAG_NAME}, in NAME_SPACE: ${NAME_SPACE}"
+  log::info "Deploying FIPS image from repository: ${IMAGE_REGISTRY}/${IMAGE_REPO}, TAG_NAME: ${TAG_NAME}, in NAME_SPACE: ${NAME_SPACE}"
   # shellcheck disable=SC2046
   helm upgrade -i "${RELEASE_NAME}" -n "${NAME_SPACE}" \
     "${HELM_CHART_URL}" --version "${CHART_VERSION}" \
@@ -94,7 +96,87 @@ run_standard_deployment_tests() {
     return 1
   }
 
+  # Setup Chromium certificate store for Playwright
+  fips_setup_chromium_cert_store || {
+    log::error "Failed to setup Chromium certificate store"
+    return 1
+  }
+
   testing::check_and_test "${RELEASE_NAME}" "${NAME_SPACE}" "${PW_PROJECT_SHOWCASE_FIPS}" "${url}"
+}
+
+# Setup Chromium NSS certificate database for Playwright
+# This function configures the Chromium certificate store used by Playwright
+# to trust the custom root CA certificate.
+#
+# Required environment variables:
+#   FIPS_ROOT_CA_CERT - Base64-encoded root CA certificate (PEM format)
+#
+# Returns:
+#   0 - Success
+#   1 - Failure (missing vars, certutil not found, or setup failed)
+fips_setup_chromium_cert_store() {
+  log::info "Setting up Chromium certificate store for Playwright..."
+
+  # Verify required environment variable
+  if [[ -z "${FIPS_ROOT_CA_CERT:-}" ]]; then
+    log::error "FIPS_ROOT_CA_CERT is not set - cannot setup Chromium cert store"
+    return 1
+  fi
+
+  # Check if certutil is available
+  if ! command -v certutil &> /dev/null; then
+    log::error "certutil command not found - required for NSS database setup"
+    return 1
+  fi
+
+  local nss_db_dir="${HOME}/.pki/nssdb"
+  local root_ca_file="${HOME}/.pki/rootCA.crt"
+
+  # Create NSS database directory
+  log::info "Creating NSS database directory: ${nss_db_dir}"
+  mkdir -p "${nss_db_dir}"
+
+  # Initialize NSS database (without sql: prefix for -N)
+  log::info "Initializing NSS database..."
+  if ! certutil -N -d "${nss_db_dir}" --empty-password; then
+    log::error "Failed to initialize NSS database"
+    return 1
+  fi
+
+  log::success "✓ NSS database initialized"
+
+  # Write root CA certificate to file
+  log::info "Writing root CA certificate to ${root_ca_file}"
+  if ! echo "${FIPS_ROOT_CA_CERT}" | base64 -d > "${root_ca_file}"; then
+    log::error "Failed to decode and write root CA certificate"
+    return 1
+  fi
+
+  # Add root CA certificate to NSS database (WITH sql: prefix for -A)
+  log::info "Adding root CA certificate to NSS database..."
+  if ! certutil -A -d "sql:${nss_db_dir}" -t "C,," -n "FIPS Root CA" -i "${root_ca_file}"; then
+    log::error "Failed to add root CA certificate to NSS database"
+    return 1
+  fi
+
+  log::success "✓ Root CA certificate added to NSS database"
+
+  # Verify certificate was added
+  log::info "Verifying certificate installation..."
+  if ! certutil -L -d "sql:${nss_db_dir}" | grep -q "FIPS Root CA"; then
+    log::error "Certificate verification failed - 'FIPS Root CA' not found in database"
+    return 1
+  fi
+
+  log::success "✓ Certificate verified in NSS database"
+
+  # List all certificates for debugging
+  log::info "Certificates in NSS database:"
+  certutil -L -d "sql:${nss_db_dir}"
+
+  log::success "Chromium certificate store setup completed successfully"
+  return 0
 }
 
 # Configure custom CA certificate for OpenShift Ingress Controller
