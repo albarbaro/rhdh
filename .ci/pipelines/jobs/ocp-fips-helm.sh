@@ -27,9 +27,6 @@ handle_ocp_fips_helm() {
 
   deploy_test_backstage_customization_provider "${NAME_SPACE}"
 
-  log::info "Sleeping for 40 minutes to allow manual cluster debugging..."
-  sleep 2400
-
   run_standard_deployment_tests
 }
 
